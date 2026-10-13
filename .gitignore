@@ -1,0 +1,21 @@
+# secrets - NEVER commit
+.env
+backend/.env
+
+# model weights (shared separately)
+*.keras
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# Node
+node_modules/
+dist/
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
