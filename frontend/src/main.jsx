@@ -1,7 +1,8 @@
 import React,{useEffect,useMemo,useState} from 'react';
 import {createRoot} from 'react-dom/client';
-import {Activity,ArrowRight,AudioLines,Check,ChevronRight,Clock3,FileImage,History,Info,Lightbulb,LayoutDashboard,LockKeyhole,LogOut,Mail,Mic,RefreshCcw,ShieldCheck,Stethoscope,UploadCloud,UserRound,X,PanelLeftClose,PanelLeftOpen} from 'lucide-react';
+import {Activity,AlertTriangle,ArrowRight,AudioLines,Check,ChevronRight,Clock3,FileImage,History,Info,Lightbulb,LayoutDashboard,LockKeyhole,LogOut,Mail,Mic,RefreshCcw,ShieldCheck,Sparkles,Stethoscope,UploadCloud,UserRound,X,PanelLeftClose,PanelLeftOpen} from 'lucide-react';
 import './styles.css';
+import './insights.css';
 
 const API=import.meta.env.VITE_API_URL||'';
 const AUDIO_TYPES=['audio/wav','audio/x-wav','audio/wave'];
@@ -74,12 +75,12 @@ function Workspace({user,onLogout}){
   <aside className={'sidebar '+(sidebar?'open':'closed')}>
    <div className="brand"><div className="brandMark"><Activity size={21}/></div>{sidebar&&<div><strong>respira</strong><span>respiratory intelligence</span></div>}</div>
    <nav><button className={page==='assessment'?'active':''} onClick={()=>setPage('assessment')}><LayoutDashboard size={19}/>{sidebar&&'Assessment'}</button><button className={page==='history'?'active':''} onClick={()=>setPage('history')}><History size={19}/>{sidebar&&'Assessment history'}</button></nav>
-   {sidebar&&<div className="sideBottom"><div className="trust"><ShieldCheck size={18}/><div><b>Private by design</b><span>Files are analysed, never stored.</span></div></div><div className="profile"><div className="avatar">{initials(user.name)}</div><div className="profileText"><b>{user.name}</b><span>{user.email}</span></div><button aria-label="Sign out" title="Sign out" onClick={logout}><LogOut size={16}/></button></div></div>}
+   {sidebar&&<div className="sideBottom"><div className="trust"><ShieldCheck size={18}/><div><b>Your results are safe with us</b></div></div><div className="profile"><div className="avatar">{initials(user.name)}</div><div className="profileText"><b>{user.name}</b><span>{user.email}</span></div><button aria-label="Sign out" title="Sign out" onClick={logout}><LogOut size={16}/></button></div></div>}
   </aside>
   <main className={'main '+(sidebar?'':'wide')}>
-   <header><button className="iconBtn" onClick={()=>setSidebar(v=>!v)}>{sidebar?<PanelLeftClose size={20}/>:<PanelLeftOpen size={20}/>}</button><div className="headerTitle"><span>{page==='history'?'Assessment history':'Respiratory assessment'}</span><small>AI-assisted screening workspace</small></div><div className="headerRight"><span className="statusDot"><i/> System ready</span><div className="miniAvatar" title={user.email}>{initials(user.name)}</div></div></header>
+   <header><button className="iconBtn" onClick={()=>setSidebar(v=>!v)}>{sidebar?<PanelLeftClose size={20}/>:<PanelLeftOpen size={20}/>}</button><div className="headerTitle"><span>{page==='history'?'Assessment history':'Respiratory assessment'}</span><small>AI-assisted screening workspace</small></div><div className="headerRight"><i/><div className="miniAvatar" title={user.email}>{initials(user.name)}</div></div></header>
    {page==='assessment'?<Assessment audio={audio} xray={xray} setAudio={setAudio} setXray={setXray} remove={remove} predict={predict} busy={busy} result={result} reset={reset}/>:<HistoryPage history={history} onOpen={(r)=>{setResult(r);setPage('assessment');setTimeout(()=>document.getElementById('results')?.scrollIntoView({behavior:'smooth'}),100)}}/>}
-   <footer><span>Respira v1.2</span><span><Info size={14}/> Model output is supportive, not a medical diagnosis.</span></footer>
+   <footer><span>R</span><span><Info size={14}/> Model output is supportive, not a medical diagnosis.</span></footer>
   </main>
   {toast&&<div className="toast"><Check size={17}/>{toast}</div>}
  </div>
@@ -114,7 +115,49 @@ function FilePreview({file,audio,onRemove}){
  useEffect(()=>()=>URL.revokeObjectURL(url),[url]);
  return <div className="filePreview">{audio?<div className="audioPreview"><audio controls src={url}/><div className="wave">{Array.from({length:34},(_,i)=><i key={i} style={{height:(10+(Math.sin(i*1.8)+1)*9)+'px'}}/> )}</div></div>:<div className="imagePreview"><img src={url} alt="Uploaded chest X-ray preview"/></div>}<div className="fileMeta"><div><b>{file.name}</b><span>{formatBytes(file.size)} · {audio?'WAV audio':'X-ray image'}</span></div><button onClick={onRemove} aria-label="Remove file"><X size={17}/></button></div></div>}
 function HowItWorks(){return <section className="how"><div className="sectionHeading"><div><h2>Designed around the clinical workflow</h2><p>Simple inputs, transparent outputs, no unnecessary complexity.</p></div></div><div className="howGrid"><div><span>01</span><h3>Upload</h3><p>Add the WAV recording, X-ray, or both from the assessment screen.</p></div><div><span>02</span><h3>Predict</h3><p>Your connected ML service will process each selected modality.</p></div><div><span>03</span><h3>Review</h3><p>See the predicted finding and confidence in one structured view.</p></div></div></section>}
-function Results({result,reset}){const suggestions=getSuggestions(result);return <section className="results" id="results"><div className="resultHeader"><div><div className="eyebrow"><Check size={15}/> ANALYSIS COMPLETE</div><h2>Assessment results</h2><p>{result.date} · Model predictions from selected inputs</p></div><button className="secondaryBtn" onClick={reset}><RefreshCcw size={16}/> New assessment</button></div><div className="resultGrid">{result.audio&&<ResultCard title="Chest sound" icon={<AudioLines size={20}/>} label="Respiratory finding" value={result.audio.label} confidence={result.audio.confidence} extra={result.audio.extra} probabilities={result.audio.probabilities}/>} {result.xray&&<ResultCard title="Chest X-ray" icon={<FileImage size={20}/>} label="Predicted finding" value={result.xray.label} confidence={result.xray.confidence} extra={result.xray.extra} image={result.xray.preview} probabilities={result.xray.probabilities}/>}</div><Suggestions suggestions={suggestions}/><div className="clinicalNote"><div className="noteIcon"><Info size={18}/></div><div><b>Clinical interpretation</b><p>This interface reports model predictions for screening support. A qualified healthcare professional should review the original clinical data before making a diagnosis or treatment decision.</p></div></div></section>}
+function Results({result,reset}){const suggestions=getSuggestions(result);return <section className="results" id="results"><div className="resultHeader"><div><div className="eyebrow"><Check size={15}/> ANALYSIS COMPLETE</div><h2>Assessment results</h2><p>{result.date} · Model predictions from selected inputs</p></div><button className="secondaryBtn" onClick={reset}><RefreshCcw size={16}/> New assessment</button></div><div className="resultGrid">{result.audio&&<ResultCard title="Chest sound" icon={<AudioLines size={20}/>} label="Respiratory finding" value={result.audio.label} confidence={result.audio.confidence} extra={result.audio.extra} probabilities={result.audio.probabilities}/>} {result.xray&&<ResultCard title="Chest X-ray" icon={<FileImage size={20}/>} label="Predicted finding" value={result.xray.label} confidence={result.xray.confidence} extra={result.xray.extra} image={result.xray.preview} probabilities={result.xray.probabilities}/>}</div><AiInsights result={result}/><Suggestions suggestions={suggestions}/><div className="clinicalNote"><div className="noteIcon"><Info size={18}/></div><div><b>Clinical interpretation</b><p>This interface reports model predictions for screening support. A qualified healthcare professional should review the original clinical data before making a diagnosis or treatment decision.</p></div></div></section>}
+const insightsCache=new Map();
+const insightPayload=(p)=>p?{predicted_class:p.predicted_class,confidence:p.confidence,probabilities:p.probabilities||{}}:null;
+const SOURCE_LABEL={audio:'Chest sound',xray:'Chest X-ray'};
+const AGREEMENT={both_abnormal:'Both inputs show an abnormal pattern',both_normal:'Both inputs show a normal pattern',differ:'The two inputs differ'};
+
+function SourceBadge({source}){return <span className={'sourceBadge '+source}>{source==='audio'?<AudioLines size={12}/>:<FileImage size={12}/>}{SOURCE_LABEL[source]}</span>}
+
+function AiInsights({result}){
+ const key=String(result.id);
+ const [state,setState]=useState(()=>insightsCache.has(key)?{status:'ok',data:insightsCache.get(key)}:{status:'loading'});
+ const [attempt,setAttempt]=useState(0);
+ useEffect(()=>{
+  if(insightsCache.has(key)){setState({status:'ok',data:insightsCache.get(key)});return}
+  let cancelled=false;setState({status:'loading'});
+  api('/api/insights',{method:'POST',json:{audio:insightPayload(result.audio),xray:insightPayload(result.xray)}})
+   .then(d=>{insightsCache.set(key,d);if(!cancelled)setState({status:'ok',data:d})})
+   .catch(e=>{if(!cancelled)setState({status:'error',message:e.status===401?'Your session expired. Please sign in again.':(e.message||'AI insights are unavailable right now.')})});
+  return()=>{cancelled=true};
+ },[key,attempt]);
+ const both=!!(result.audio&&result.xray);
+ return <section className="insights" aria-live="polite">
+  <div className="insightsHeading"><div className="insightsIcon"><Sparkles size={19}/></div><div><div className="eyebrow">AI HEALTH INSIGHTS</div><h2>Understanding your results</h2><p>A plain-language explanation of the model predictions above, generated by AI. It is educational and does not change the predictions.</p></div><span className="aiTag">AI-GENERATED</span></div>
+  {state.status==='loading'&&<InsightsSkeleton both={both}/>}
+  {state.status==='error'&&<div className="insightError" role="alert"><AlertTriangle size={20}/><div><b>AI insights are unavailable right now.</b><p>{state.message} Your model results above are not affected.</p></div><button className="secondaryBtn" onClick={()=>setAttempt(a=>a+1)}><RefreshCcw size={14}/> Try again</button></div>}
+  {state.status==='ok'&&<InsightsBody data={state.data} both={both}/>}
+  <InsightsDisclaimer/>
+ </section>}
+
+function InsightsSkeleton({both}){return <div className="skel" aria-busy="true"><div className="skelNote"><span className="spinner dark" style={{width:16,height:16}}/> Preparing your explanation…</div><i className="block"/><div className="row2"><i/><i/></div>{both&&<i className="block"/>}<i style={{width:'70%'}}/><i style={{width:'55%'}}/></div>}
+
+function InsightsBody({data,both}){
+ return <>
+  <p className="insightSummary">{data.summary}</p>
+  <div className="insightSection"><h3>What the models detected</h3><div className="findingGrid">{data.findings.map(f=><article className="findingCard" key={f.source}><div className="findingTop"><SourceBadge source={f.source}/><span className="confChip">Model confidence <b>{f.confidence}%</b></span></div><h4>{f.detected}</h4><p>{f.meaning}</p></article>)}</div></div>
+  <div className="insightSection"><h3>Possible associated conditions</h3>{data.possible_associations.length>0?<div className="assocGrid">{data.possible_associations.map((a,i)=><article className="assocCard" key={a.source+i}>{both&&<SourceBadge source={a.source}/>}<h4>{a.condition}</h4><p>{a.why}</p></article>)}</div>:<p className="insightNote">No specific conditions are suggested for these results. A normal model result does not rule out every respiratory condition, so persistent symptoms should still be checked by a clinician.</p>}<p className="insightNote" style={{marginTop:10}}>These are possible associations only, not diagnoses.</p></div>
+  {both&&data.combined_interpretation&&<div className="insightSection"><h3>Combined interpretation</h3><div className="combinedCard">{data.agreement&&<span className={'agreeChip '+data.agreement}>{AGREEMENT[data.agreement]}</span>}<p>{data.combined_interpretation}</p></div></div>}
+  <div className="insightSection"><h3>Recommended next steps</h3><ul className="insightList numbered">{data.recommended_next_steps.map((t,i)=><li key={i}>{t}</li>)}</ul></div>
+  <div className="insightSection"><h3>Limitations</h3><ul className="insightList">{data.limitations.map((t,i)=><li key={i}>{t}</li>)}</ul></div>
+ </>}
+
+function InsightsDisclaimer(){return <div className="insightsFooter"><div className="disclaimer"><Info size={16}/><p><b>Medical disclaimer.</b> This explanation is AI-generated educational information. It is not medical advice, a diagnosis or a treatment plan, and the AI can make mistakes. Model confidence is not the probability that you have a disease. Always consult a qualified healthcare professional.</p></div><div className="emergency"><AlertTriangle size={16}/><p><b>Seek urgent medical care</b> if you have severe difficulty breathing, chest pain, blue or grey lips, confusion, coughing up blood or a very high fever. Do not wait for these results. Call your local emergency number.</p></div></div>}
+
 function Suggestions({suggestions}){return <section className="suggestions"><div className="suggestionsHeading"><div className="suggestionIcon"><Lightbulb size={19}/></div><div><div className="eyebrow">NEXT STEPS</div><h2>Suggestions after analysis</h2><p>General guidance based on the displayed model findings. These suggestions are not a diagnosis or treatment plan.</p></div></div><div className="suggestionGrid">{suggestions.map((item,i)=><article className="suggestionCard" key={i}><span className="suggestionNumber">0{i+1}</span><div><h3>{item.title}</h3><p>{item.text}</p></div></article>)}</div></section>}
 
 function getSuggestions(result){

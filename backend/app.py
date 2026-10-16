@@ -14,6 +14,7 @@ import config
 import db
 from assessment_routes import router as assessment_router
 from auth_routes import get_current_user, router as auth_router
+from insights_routes import router as insights_router
 
 log = logging.getLogger("respira")
 logging.basicConfig(level=logging.INFO)
@@ -80,6 +81,7 @@ app.add_middleware(CORSMiddleware, allow_origins=[config.FRONTEND_URL, "http://1
 
 app.include_router(auth_router)
 app.include_router(assessment_router)
+app.include_router(insights_router)
 
 
 @app.exception_handler(PyMongoError)
@@ -92,6 +94,7 @@ async def mongo_error_handler(_, exc: PyMongoError):
 def health():
     return {"audio_ready": state["audio"] is not None, "xray_ready": state["xray"] is not None,
             "db_ready": state["db_error"] is None,
+            "gemini_configured": bool(config.GEMINI_API_KEY),
             "audio_error": state["audio_error"], "xray_error": state["xray_error"],
             "db_error": state["db_error"]}
 

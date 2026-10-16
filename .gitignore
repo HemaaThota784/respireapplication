@@ -5,13 +5,13 @@ backend/.env
 # model weights (shared separately)
 *.keras
 
-# Python
+# Python 
 .venv/
 venv/
 __pycache__/
 *.pyc
 
-# Node
+# Node 
 node_modules/
 dist/
 
