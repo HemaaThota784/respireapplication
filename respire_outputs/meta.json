@@ -1,0 +1,28 @@
+{
+  "temperature": 2.3075218845965253,
+  "ensemble": [
+    {
+      "file": "respire_logits_main_s123.keras",
+      "temperature": 2.3075218845965253
+    }
+  ],
+  "class_names": [
+    "normal",
+    "crackle",
+    "wheeze",
+    "both"
+  ],
+  "backbone": "resnet",
+  "gradcam_layer": "last_conv_act",
+  "split": "Patient wise split",
+  "test_metrics_calibrated": {
+    "Sp": 0.8575342465753425,
+    "Se": 0.6953846153846154,
+    "Score": 0.7764594309799789,
+    "macroF1": 0.7091296366122386,
+    "BalAcc": 0.6895916434102665,
+    "Acc": 0.7811594202898551,
+    "ECE": 0.05625450210870752,
+    "NLL": 0.6185621882616259
+  }
+}

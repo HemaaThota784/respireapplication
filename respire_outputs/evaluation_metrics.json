@@ -1,0 +1,15 @@
+{
+  "split": "Patient wise split",
+  "train_cycles": 5518,
+  "validation_cycles": 690,
+  "test_cycles": 690,
+  "num_patients_total": 126,
+  "num_recordings_total": 920,
+  "backbone": "resnet",
+  "epochs_requested": 60,
+  "seeds": 1,
+  "test_accuracy": 0.7811594202898551,
+  "macro_f1": 0.7091296366122386,
+  "icbhi_score": 0.7764594309799789,
+  "balanced_accuracy": 0.6895916434102665
+}

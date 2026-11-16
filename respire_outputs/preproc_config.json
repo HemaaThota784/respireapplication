@@ -1,0 +1,15 @@
+{
+  "sr": 8000,
+  "band_low": 50.0,
+  "band_high": 2000.0,
+  "filter_order": 4,
+  "segment_s": 5.0,
+  "window_hop_s": 2.5,
+  "min_cycle_s": 0.1,
+  "n_fft": 512,
+  "hop_length": 64,
+  "n_mels": 64,
+  "mel_fmin": 0.0,
+  "mel_fmax": 2000.0,
+  "log_eps": 1e-06
+}
